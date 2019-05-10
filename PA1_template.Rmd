@@ -1,25 +1,85 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "PA1_template.Rmd"
+author: "Francis Ivan Clado"
+date: "May 10, 2019"
+output: html_document
 ---
 
-
 ## Loading and preprocessing the data
-
-
+```{r}
+library(ggplot2)
+data <- read.csv("activity.csv")
+```
 
 ## What is mean total number of steps taken per day?
+Use the tapply function to calculate the total steps per day.
+```{r}
+total <- tapply(data$steps, data$date, FUN=sum, na.rm=TRUE)
+```
 
+Load the ggplot2 package and use the qplot function to create a histogram.
+```{r}
+library(ggplot2)
+qplot(total.steps, binwidth=1000, xlab="total number of steps taken each day")
+```
+
+Use the mean and median function.
+```{r}
+mean(total.steps, na.rm=TRUE)
+median(total.steps, na.rm=TRUE)
+```
 
 
 ## What is the average daily activity pattern?
+Call the aggregate function to get the average steps for each 5-minute interval.
+```{r}
+intervalsteps <- aggregate(x=list(steps=data$steps), by=list(interval=data$interval),
+                      FUN=mean, na.rm=TRUE)
+```
 
+Use ggplot to create a time series plot.
+```{r}
+ggplot(data=intervalsteps, aes(x=interval, y=steps)) +
+  geom_line() +
+  xlab("5-minute interval") +
+  ylab("average number of steps taken")
+```
+
+Use the which and max function to determine Which 5-minute interval contains the maximum number of steps.
+```{r}
+intervalsteps[which.max(averages$steps),]
+```
 
 
 ## Imputing missing values
-
-
+Create a logical vector that indicates whether a value in data$steps is null, then use the length function to count the null values. Replace the null values with the mean of the number of steps.
+```{r}
+nas <- is.na(data$steps)
+length(nas[nas==TRUE])
+data[is.na(data)] <- mean(data$steps)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+Create a function that determines if a given date is a weekday or weekend.
+```{r}
+daytype <- function(date) {
+type <- ""  
+type <- ifelse(weekdays(date) %in% c("Saturday", "Sunday"), "Weekend", "Weekday")
+type 
+}
+```
+
+Convert the values in data$date into a date class. Use sapply to use the created function on each date. Convert the daytype values into a factor variable with two levels.
+```{r}
+data$date <- as.Date(data$date)
+data$daytype <- sapply(data$date, FUN=daytype)
+data$daytype <- as.factor(data$daytype)
+```
+
+Use the aggregate function and ggplot to create a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+```{r}
+panelplot <- aggregate(steps ~ interval + daytype, data=data, mean)
+ggplot(panelplot, aes(interval, steps)) + geom_line() + facet_grid(daytype ~ .) +
+  xlab("5-minute interval") + ylab("Number of steps")
+```
+
