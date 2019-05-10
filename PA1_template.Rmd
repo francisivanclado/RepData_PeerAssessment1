@@ -1,5 +1,5 @@
 ---
-title: "PA1_template.Rmd"
+title: "Reproducible Research - Course Project 1"
 author: "Francis Ivan Clado"
 date: "May 10, 2019"
 output: html_document
@@ -20,13 +20,13 @@ total <- tapply(data$steps, data$date, FUN=sum, na.rm=TRUE)
 Load the ggplot2 package and use the qplot function to create a histogram.
 ```{r}
 library(ggplot2)
-qplot(total.steps, binwidth=1000, xlab="total number of steps taken each day")
+qplot(total, binwidth=1000, xlab="total number of steps taken each day")
 ```
 
 Use the mean and median function.
 ```{r}
-mean(total.steps, na.rm=TRUE)
-median(total.steps, na.rm=TRUE)
+mean(total, na.rm=TRUE)
+median(total, na.rm=TRUE)
 ```
 
 
@@ -47,7 +47,7 @@ ggplot(data=intervalsteps, aes(x=interval, y=steps)) +
 
 Use the which and max function to determine Which 5-minute interval contains the maximum number of steps.
 ```{r}
-intervalsteps[which.max(averages$steps),]
+intervalsteps[which.max(intervalsteps$steps),]
 ```
 
 
